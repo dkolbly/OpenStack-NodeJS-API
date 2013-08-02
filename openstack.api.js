@@ -131,12 +131,16 @@ OSapi.prototype.makeCall = function(params,callback){
     // Set up the request
     var post_req = http.request(post_options, function(res) {
         res.setEncoding('utf8');
-        var chunks = '';
+        var chunks = [];
         res.on('data', function (chunk) {
-            chunks += chunk;
+            chunks.push(chunk);
         });
         res.on('end', function(){ 
-            callback(JSON.parse(chunks)); 
+            if (chunks.length === 0) {
+                callback();
+            } else {
+                callback(JSON.parse(Buffer.concat(chunks).toString()));
+            }
         });
     });
     
